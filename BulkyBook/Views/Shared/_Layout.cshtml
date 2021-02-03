@@ -1,4 +1,7 @@
 ﻿@using BulkyBook.Utility
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -58,6 +61,26 @@
                                 </div>
                             </li>
                         }
+                        @if (HttpContextAccessor.HttpContext.Session.GetInt32(SD.ssShopingCart) != null)
+                        {
+                            <li style="color:white;">
+                                <a asp-area="Customer" asp-controller="Cart" asp-action="Index" class="nav-link">
+                                    @{
+                                        var count = HttpContextAccessor.HttpContext.Session.GetInt32(SD.ssShopingCart);
+                                    }
+                                    <i class="fas fa-shopping-cart"></i>&nbsp; (@count)
+                                </a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li style="color:white;">
+                                <a href="#" class="nav-link">
+                                    <i class="fas fa-shopping-cart"></i>&nbsp; (0)
+                                </a>
+                            </li>
+                        }
+
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>
