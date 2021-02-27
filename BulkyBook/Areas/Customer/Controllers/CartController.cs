@@ -149,7 +149,7 @@ namespace BulkyBook.Areas.Customer.Controllers
             _unitofWork.OrderHeader.Add(ShoppingCartVm.OrderHeader);
             _unitofWork.Save();
 
-            List<OrderDetails> orderDetailsList = new List<OrderDetails>();
+            
             foreach(var item in ShoppingCartVm.ListCart)
             {
                 item.Price = SD.GetPriceBasedOnQuantity(item.Count, item.Product.Price, item.Product.Price50, item.Product.Price100);
@@ -174,8 +174,7 @@ namespace BulkyBook.Areas.Customer.Controllers
                 ShoppingCartVm.OrderHeader.PaymentDueDate = DateTime.Now.AddDays(30);
                 ShoppingCartVm.OrderHeader.PaymentStatus = SD.PaymentStatusDelayedPayment;
                 ShoppingCartVm.OrderHeader.OrderStatus = SD.StatusApproved;
-            }
-            {
+            }else{
                 //process the paymnet
                 var options = new ChargeCreateOptions
                 {
