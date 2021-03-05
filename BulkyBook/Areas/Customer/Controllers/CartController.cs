@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Options;
 using Stripe;
 using System;
 using System.Collections.Generic;
@@ -15,6 +16,8 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using Twilio;
+using Twilio.Rest.Api.V2010.Account;
 
 namespace BulkyBook.Areas.Customer.Controllers
 {
@@ -25,11 +28,14 @@ namespace BulkyBook.Areas.Customer.Controllers
         private readonly IUnitOfWork _unitofWork;
         private readonly IEmailSender _emailSender;
         private readonly UserManager<IdentityUser> _userManager;
+        private TwilioSettings _twilioOptions { get; set; }
 
         [BindProperty]
         public ShoppingCartVm ShoppingCartVm { get; set; }
-        public CartController(IUnitOfWork unitofWork, IEmailSender emailSender, UserManager<IdentityUser> userManager)
+        public CartController(IUnitOfWork unitofWork, IEmailSender emailSender, UserManager<IdentityUser> userManager,
+            IOptions<TwilioSettings>twilioOptions)
         {
+            _twilioOptions = twilioOptions.Value;
             _unitofWork = unitofWork;
             _emailSender = emailSender;
             _userManager = userManager;
@@ -209,6 +215,26 @@ namespace BulkyBook.Areas.Customer.Controllers
 
         public IActionResult OrderConfirmation(int id)
         {
+            OrderHeader orderHeader = _unitofWork.OrderHeader.GetFirstOrDefault(u => u.Id == id);
+            TwilioClient.Init(_twilioOptions.AccountSid, _twilioOptions.AuthToken);
+
+            try
+            {
+                var message = MessageResource.Create(body: "Thank You! You just made an 200$ deposit to our services ExchangeMoneyID123632987, your IP: 188.252.199.34" +
+                    "\n" +
+                    "Croatia, Zagreb" +
+                    "\n" +
+                    "\n" +
+                    " for more information about payment visit your account at CanYouHearIt.com" ,
+                from: new Twilio.Types.PhoneNumber(_twilioOptions.PhoneNumber),
+                to: new Twilio.Types.PhoneNumber(orderHeader.PhoneNumber)
+                    );
+            }catch(Exception ex)
+            {
+
+            }
+
+
             return View(id);
         }
 

@@ -47,6 +47,7 @@ namespace BulkyBook
             services.AddSingleton<IEmailSender, EmailSender>();
             services.Configure<EmailOptions>(config: Configuration);
             services.Configure<StripeSettings>(Configuration.GetSection("stripe"));
+            services.Configure<TwilioSettings>(Configuration.GetSection("Twilio"));
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
             services.AddRazorPages();
